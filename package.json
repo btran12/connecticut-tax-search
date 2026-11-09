@@ -1,0 +1,20 @@
+{
+  "name": "connecticut-tax-search",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Search Connecticut municipal tax bills across multiple towns by last name and first initial, with full bill details and CSV export.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "express": "^5.3.0"
+  }
+}

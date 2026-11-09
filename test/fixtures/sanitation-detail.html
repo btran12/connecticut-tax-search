@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+<html dir="ltr" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+	<META HTTP-EQUIV="Pragma" CONTENT="NO-CACHE">
+	<META HTTP-EQUIV="Expires" CONTENT="-1">
+	<meta charset="UTF-8">
+	<title>City of Hartford - Tax Bills Search & Pay</title>
+	<meta name="description" content="Revenue Bill Search & Pay - City of Hartford">
+	<link href="/inet/images/hartford.gif" rel="icon">
+	<link rel="stylesheet" type="text/css" href="/inet/css/stylesheet_parking.css">
+	<link rel="stylesheet" type="text/css" href="/inet/css/stylesheet-round-parking.css">
+	<link rel="stylesheet" type="text/css" href="/inet/css/slideshow.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="/inet/css/carousel.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="/inet/css/colorbox.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="/inet/css/jquery/jquery-ui-1.8.16.custom.css">
+	<link rel="stylesheet" type="text/css" href="/inet/css/facebox.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="/inet/css/colorbox.css" media="screen"> 
+	
+	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="/inet/js/jquery/jquery.cookie.js"></script>
+	<script type="text/javascript" src="/inet/js/jquery/jquery.colorbox.js"></script>
+	<script type="text/javascript" src="/inet/js/jquery/tabs.js"></script>
+	<script type="text/javascript" src="/inet/js/common.js"></script>
+	<script type="text/javascript" src="/inet/js/itechshop.js"></script>
+	<script type="text/javascript" src="/inet/js/facebox.js"></script>   
+	<script type="text/javascript" src="/inet/js/qds.js"></script>
+	<script type="text/javascript" src="/inet/js/jquery/jquery.mask.js"></script>
+  	<script type="text/javascript" src="/inet/js/jquery/jquery.idletimer.js"></script>
+
+	<!-- Bootstrap -->
+	<script src="../js/cama/bootstrap.min.js"></script>
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="../css/bootstrap.min.css">
+	<!-- Bootstrap responsive -->
+	<link rel="stylesheet" href="../css/bootstrap-responsive.min.css">
+  	
+	<script type="text/javascript">
+  		if ( $.attrFn ) { $.attrFn.text = true; } // fix session timeout button label missing bug
+	</script>
+		
+	<script type="text/javascript">
+	   jQuery(document).ready(function($) {
+	     $('a[rel*=facebox]').facebox({
+	       loading_image : 'loading.gif',
+	       close_image   : 'closelabel.gif'
+	     });  
+	     $('#payModal').on('hidden', function() {
+		    $(this).removeData('modal');
+		 }); 
+	   })	 
+	</script>
+	
+		  	
+  	
+		<script type="text/javascript">
+			var _gaq = _gaq || [];
+		
+			_gaq.push(['_setAccount', 'UA-31641478-3']);
+		
+			_gaq.push(['_trackPageview']); 
+		
+			(function() {
+			
+			  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			
+			  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			
+			  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		
+			})();
+		</script>
+  		
+	  	
+	<script type="text/javascript" src="/inet/js/jquery/jquery.nivo.slider.pack.js"></script>
+	<script type="text/javascript" src="/inet/js/jquery/jquery.jcarousel.min.js"></script>
+	<!--[if IE 7]>
+	<link rel="stylesheet" type="text/css" href="/inet/css/ie7.css" />
+	<![endif]-->
+	<!--[if lt IE 7]>
+	<link rel="stylesheet" type="text/css" href="/inet/css/ie6.css" />
+	<script type="text/javascript" src="/inet/js/jquery/DD_belatedPNG_0.0.8a-min.js"></script>
+	<script type="text/javascript">
+	DD_belatedPNG.fix('#logo img');
+	</script>
+	<![endif]-->
+	
+	
+  <script type="text/javascript">
+	var idleTime = 1500000; // number of miliseconds until the user is considered idle
+	var initialSessionTimeoutMessage = 'Your session will expire in <span id="sessionTimeoutCountdown"></span>&nbsp;seconds.<br/><br />Click on <b>OK</b> to continue your session.';
+	var sessionTimeoutCountdownId = 'sessionTimeoutCountdown';
+	var redirectAfter = 10; // number of seconds to wait before redirecting the user
+	var redirectTo = '/inet/bill/invaliateSession.do'; // URL to relocate the user to once they have timed out
+	var keepAliveURL = '/inet/bill/home.do'; // URL to call to keep the session alive
+	var expiredMessage = 'Your session has expired.  You are being logged out for security reasons.'; // message to show user when the countdown reaches 0
+	var running = false; // var to check if the countdown is running
+	var timer; // reference to the setInterval timer so it can be stopped
+	$(document).ready(function() {
+		// create the warning window and set autoOpen to false
+		var sessionTimeoutWarningDialog = $("#sessionTimeoutWarning");
+		$(sessionTimeoutWarningDialog).html(initialSessionTimeoutMessage);
+		$(sessionTimeoutWarningDialog).dialog({
+			title: 'Session Expiration Warning',
+			autoOpen: false,	// set this to false so we can manually open it
+			closeOnEscape: false,
+			draggable: false,
+			width: 460,
+			minHeight: 50, 
+			modal: true,
+			beforeclose: function() { // bind to beforeclose so if the user clicks on the "X" or escape to close the dialog, it will work too
+				// stop the timer
+				clearInterval(timer);
+					
+				// stop countdown
+				running = false;
+				
+				// ajax call to keep the server-side session alive
+				$.ajax({
+				  url: keepAliveURL,
+				  async: false
+				});
+			},
+			buttons: {
+				"OK": function() {
+					// close dialog
+					$(this).dialog('close');
+				}
+			},
+			resizable: false,
+			open: function() {
+				// scrollbar fix for IE
+				$('body').css('overflow','hidden');
+			},
+			close: function() {
+				// reset overflow
+				$('body').css('overflow','auto');
+			}
+		}); // end of dialog
+
+
+		// start the idle timer
+		$.idleTimer(idleTime);
+		
+		// bind to idleTimer's idle.idleTimer event
+		$(document).bind("idle.idleTimer", function(){
+			// if the user is idle and a countdown isn't already running
+			if($.data(document,'idleTimer') === 'idle' && !running){
+				var counter = redirectAfter;
+				running = true;
+				
+				// intialisze timer
+				$('#'+sessionTimeoutCountdownId).html(redirectAfter);
+				// open dialog
+				$(sessionTimeoutWarningDialog).dialog('open');
+				
+				// create a timer that runs every second
+				timer = setInterval(function(){
+					counter -= 1;
+					
+					// if the counter is 0, redirect the user
+					if(counter === 0) {
+						$(sessionTimeoutWarningDialog).html(expiredMessage);
+						$(sessionTimeoutWarningDialog).dialog('disable');
+						window.location = redirectTo;
+					} else {
+						$('#'+sessionTimeoutCountdownId).html(counter);
+					};
+				}, 1000);
+			};
+		});
+
+	});
+  </script>
+	<script type="text/javascript">
+	   	jQuery(document).ready(function($) {
+			
+				$( "#sewerMenu" ).css({ 'color': 'yellow', 'font-size': '120%', 'font-weight': 'bold', 'font-style': 'italic' });
+			
+	   })
+	</script>
+	
+	<!-- Google Tag Manager -->
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','GTM-WM5K6FFR');</script>
+	<!-- End Google Tag Manager -->
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WM5K6FFR"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<div id="container">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="header">
+    <div id="logo">
+    	<table>
+    		<tr>
+    			<td>
+    				
+			    		<a href="http://www.cityofhartford.com/" target="_blank"><img src="/inet/images/hartford.gif" title="Revenue Search" alt="Revenue Search"></a>
+					
+    			</td>
+    			<td>			    	
+					
+						<span style="padding-left: 6px; font-weight: bold; font-size: 16px;">City of Hartford</span>
+					
+    			</td>
+    		</tr>
+    	</table>
+    	
+    </div>
+	
+  	<div id="cart">
+  	<div style="float: right; text-transform: none; font-size: 10px; padding-bottom: 10px;">Account info last updated on Nov 8, 2026</div>
+  	
+	
+  	<div class="title"></div>
+  	<div class="heading">
+	   	<img src="/inet/images/cart.png" title="Cart" alt="Cart" style="padding-top: 2px; float: left;">&nbsp;
+	    <a>
+	    	<span id="cart-total">
+	    		0 Bill(s) - $0.00
+	    	</span>
+	    </a>
+	</div>
+  	<div class="content">
+        <div class="mini-cart-info">
+      		<table>
+        	
+        	
+        	
+       		</table>
+   		</div>
+   		
+	    <div class="mini-cart-total">
+	      	<table>
+	          	<tbody>
+	            <tr>
+	          		<td class="right"><b>Total:</b></td>
+	          		<td class="right">$0.00</td>
+	        	</tr>
+	            </tbody>
+	    	</table>
+	    </div>
+    	<div class="checkout"><a href="/inet/bill/cart.do">View Cart</a> | <a href="/inet/bill/cart.do">Checkout</a></div>
+    </div>
+
+</div>
+
+  <div class="links" style="padding-top: 10px;">
+  	
+	  	<a href="/inet/bill/home.do?town=hartford">Home</a>
+	
+	
+	  	<a href="/inet/bill/cart.do">Shopping Cart</a>
+	  	<a href="/inet/bill/cart.do">Checkout</a>
+	
+  </div>
+
+</div>
+<div id="menu">
+  	<ul>
+  		
+       		<li><a id="taxMenu" href="/inet/bill/home.do?town=hartford">Tax Bills</a></li>
+		  		  
+			  		
+		       			<li><a id="sewerMenu" href="/inet/bill/home.do?town=hartford&search=2">Sanitation</a></li>
+			    	
+		    	
+	    	
+	    	
+	    
+  	</ul>
+</div>
+
+<div id="notification">
+	
+ 	
+	
+</div>
+
+
+
+<!-- Default bootstrap modal example -->
+<div class="modal fade" id="payModal" tabindex="-1" role="dialog" aria-labelledby="payModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Make Payment</h4>
+      </div>
+      <div class="modal-body">
+      	<div></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="content">
+	<div class="box">
+	  	<div class="box-content">
+	    	<div class="box-product">
+
+
+
+
+
+
+
+
+
+
+
+	    		
+
+	
+	
+
+	
+	
+	
+	
+		
+	
+	<div class="detail-info" style="width: 100%;">
+		<table> 
+			<thead>
+				<tr>
+					<td colspan=4>Taxpayer Information</td>
+				</tr>
+			</thead>
+		  	<tr>            
+				<td>Bill #</td>
+				<td>2025-11-0001101
+				&nbsp;&nbsp;&nbsp;<b><font color="black">(SANI                     )</font></b>
+				</td>
+		  		<td>Gross Assessment</td>
+				<td>0</td> 
+		  	</tr>
+		  	<tr>            
+				<td>Unique ID</td>
+				<td>R10930</td> 
+		  		<td>Exemption</td>
+				<td>0</td>
+		  	</tr>
+		  	
+		  	<tr>            
+				<td>
+					
+						District
+  					
+				</td>
+				<td>	    	
+			    	
+		    		
+			    	
+		    		
+			    	
+				</td>
+		  		<td>Net Assessment</td>
+				<td>0</td>
+		  	</tr>
+		  	
+		  	<tr>            
+				<td>Name</td>
+				<td>SMITH JONATHAN C &amp;                      </td>
+				<td>
+					
+						Town Mill Rate
+					
+				</td>              
+				<td>
+					
+						0.00
+					
+				</td> 
+		  	</tr>
+		  	
+		  	<tr>            
+				<td>Care Of</td>
+				<td>SICKEL SMITH AMANDA E                   </td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>         
+		  	</tr>
+		  	
+		  	<tr>            
+				<td>Address</td>
+				<td>  
+			    		<br>  
+			    		&nbsp;
+			    		
+			    </td>
+			    
+			    
+					<td colspan=2>&nbsp;</td>
+			    
+		  	</tr>
+		  	
+		  	<tr>           
+				<td>		    
+		    			
+				    	Property Location
+				    	    
+		    		
+				</td>
+				<td>
+					        55
+					BRIDGE ST SOUTH                                   
+		    		
+		    		
+		    		
+		    		
+			    	
+			    	&nbsp;
+				</td>
+			    
+			    
+					<td colspan=2>&nbsp;</td>
+			     
+		  	</tr>
+		  	
+		  	<tr>          
+				<td>MBL</td>        
+				<td>			    		
+		    		
+				</td>
+				
+					<td>
+						
+							Town Benefit
+						
+					</td>              
+					<td>
+						
+							0.00
+						
+					</td> 
+				
+		  	</tr>
+		  			  	
+		  	<tr>            
+				<td>
+					
+						Volume & Page
+					
+				</td>
+				<td>    		
+		    			
+						0    
+			    	
+			    	
+			    	&nbsp;
+			    	 	    	
+		    			
+						0    
+			    	
+			    	
+			    	 
+				</td>
+				
+					<td>
+						Elderly Benefit (C)
+						
+					    
+					</td>              
+					<td>
+						0.00
+						
+					    
+					</td> 
+				
+		  	</tr>
+	</div>
+	
+	<div class="detail-info" style="width: 100%;">		
+		<table> 
+			<thead>
+				<tr>					
+					
+						<td colspan=5>Bill Information as of 11/08/2026</td>
+		  			
+					
+				</tr>
+		  	</thead>
+		  	<tr>
+		  		<td>
+		  			<table>		  				
+					  	<tr>
+					  		<td class="billdetail">Installment</td>
+					  		<td class="billdetail">Due Date</td>
+					  		
+							
+							
+								
+					  					
+					  					<td class="billdetail">Sewer</td>
+								  		
+						  		
+								
+					  		
+					  	</tr>
+					  	<tr class="odd">
+					  		<td>#1</td>
+					  		<td>
+					  			
+					  				10/10/2025
+					  			
+				  			</td>
+					  		<td>
+					  			
+					  				$281.62
+					  			
+					  		</td> 
+					  		
+							
+							
+									
+					  		
+					  	</tr>
+					  	<tr class="even">
+					  		<td>#2</td>
+					  		<td>
+					  			
+					  				04/01/2026
+					  			
+				  			</td>
+					  		<td>
+					  			
+					  				$612.25
+					  			
+					  		</td>	
+					  		
+							
+							
+								
+					  			
+					  	</tr>
+					  	<tr class="odd">
+					  		<td>#3</td>
+					  		<td>
+					  			
+					  				
+					  			
+				  			</td>
+					  		<td>
+					  			
+					  		</td>		  		
+					  		
+							
+							
+								 		
+					  			
+					  	</tr>
+					  	<tr class="even">
+					  		<td>#4</td>
+					  		<td>
+					  			
+					  				
+					  			
+				  			</td>
+					  		<td>
+					  			
+					  		</td>	
+					  		
+							
+							
+								  			
+					  			
+					  	</tr>
+					  	<tr class="odd">
+					  		<td>Adjustment</td>
+					  		<td></td>
+					  		<td>$0.00</td>	  		
+					  		
+							
+							
+									
+					  			
+					  	</tr>
+					  	<tr class="even">
+					  		<td class="bold">Total</td>
+					  		<td class="bold"></td>
+					  		<td class="bold">$893.87</td>		  		
+					  			
+					  		
+							
+							
+														
+					  			
+					  	</tr>
+					  	<tr class="odd">		  				  			
+					  		<td class="bold" style="color: green;">Total payments as of 11/08/2026</td>
+					  		<td>&nbsp;</td>
+					  		<td class="bold" style="color: green;">$893.87</td>
+					  		<td colspan=2>&nbsp;</td>
+					  	</tr>
+		  			</table>
+		  		</td>
+		  		<td>
+		  			<table class="due-info">
+		  				<tr style="">
+		  					<thead>
+				  				<th colspan=2 style="text-align: left; text-decoration: underline; color: blue;">
+				  					Total Due
+				  				</th>
+			  				</thead>
+		  				</tr>
+		  				<tr>
+			  				<td>Tax/Princ/Bint Due</td>
+		  					<td>$0.00</td>
+		  				</tr>
+		  				<tr>
+					  		<td>Interest Due</td>
+					  		<td>$0.00</td>
+		  				</tr>
+		  				<tr>
+					  		<td>Lien Due</td>
+					  		<td>$0.00</td>
+		  				</tr>
+		  				<tr>
+					  		<td>Fee Due</td>
+					  		<td>$0.00</td>
+		  				</tr>
+		  				<tr>
+					  		<td class="bold">Total Due Now</td>
+					  		<td class="bold">$0.00</td>
+		  				</tr>
+		  				<tr>
+							<td>&nbsp;</td>              
+							<td>&nbsp;</td> 
+		  				</tr>
+		  				<tr>
+					  		
+								<td class="bold">&nbsp;</td>
+								<td class="bold">&nbsp;</td>
+							 
+						     
+		  				</tr>
+		  			</table>
+		  		</td>
+		  	</tr>
+		</table>
+	</div>	
+	
+				
+		
+		 		
+	
+		<div class="cart-info" style="width: 100%; max-height: 400px; overflow: auto;">
+			<table> 
+				<thead>
+				  	<tr align="center">  
+						<td>Pay Date         </td>          
+						<td>Type</td>
+						<td>Tax/Principal</td>
+						<td>Interest</td>
+						<td>Lien</td>
+						<td>Fee</td>
+						<td>Total</td>
+				  	</tr>
+				</thead>
+			  	 
+				 
+			        
+			        
+					
+				        
+				        	<tr class="odd">
+				        
+				    	
+				    	<td>
+				    		10/29/2026
+				    	</td>
+				    	
+				    	<td>
+				    		PAY
+				    	</td>
+				    	
+				    	<td>
+				    		$893.87
+				    	</td>
+				    	
+				    	<td>
+				    		$119.21
+				    	</td>
+				    	
+				    	<td>
+				    		$0.00
+				    	</td>
+				    	
+				    	<td>
+				    		$0.00
+				    	</td>
+				    	
+				    	<td>
+				    		$1,013.08
+				    	</td>
+				        
+			  			</tr>
+			          	
+					
+				     
+				
+			</table>
+		</div>
+	
+	
+	<center>
+		
+			<div class="success">Total Payments made in 2025:&nbsp;<strong>$0.00</strong></div>
+		
+		
+  		
+		<div class="buttons">
+			<div class="right">			
+	    		
+	    		
+		    		
+						<input class="button" type="button" name="back" value="Back To Search Result" onClick="javascript: document.location='../bill/utilitiesSearchResult.do';">&nbsp;&nbsp;
+		    		
+		    		
+	    		
+	    		<input class="button" type="button" name="pdfDownload" value="Download PDF" onClick="javascript: document.location='../download/bill/detail/pdf?byear=2025&btype=11&bnum=1101';">&nbsp;&nbsp;
+	    		
+	    		
+					<input class="button" type="button" name="taxbill" value="View original tax bill" onClick="javascript: document.location='../tax/pdf?byear=2025&btype=11&bnum=1101';">&nbsp;&nbsp;
+	    		
+	    		
+	    		
+	    			
+		    		
+	    				<input class="button" type="button" name="viewBill" value="View All Bills" onClick="javascript: document.location='../bill/viewAllBill.do?type=2&byear=2025&btype=11&bnum=1101';">
+		    		
+				
+				
+					
+	    		
+	    		<input class="button" type="button" name="print" value="Print This Page" onClick="javascript: window.print();">&nbsp;&nbsp;
+	    	</div>
+	  	</div>	
+	</center>
+
+	<script type="text/javascript">
+	    $(function() {
+	        $("#button-cart").click(function(e) {
+				jQuery.facebox({ ajax: '/inet/bill/add.do' });
+	        });
+	    }); 
+	</script>
+
+</div>
+	  	</div>
+	</div>
+</div>
+<div class="clear"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="powered">	
+	
+	
+	<table width="100%" border=0 cellspacing=0 cellpadding=0>
+		<tr>
+			<td align=center>
+				<table width="90%" border=0 cellspacing=0 cellpadding=0 class=footer>
+					<tr><td align=center>
+					
+						<a href="#info5" rel="facebox" class="footer">Disclaimer</a> |
+						<a href="#info6" rel="facebox" class="footer">Terms And Conditions</a> |
+						<a href="#info7" rel="facebox" class="footer">Privacy Policy</a> |
+					
+					
+					
+						<a href="http://www.cityofhartford.com/" class="footer" target="_blank">Contact</a> 
+					
+					</td></tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	
+	<div id="info5" style="display:none;">
+		<p>The information contained on this website and its pages is obtained from municipal databases. 
+		In the event of a discrepancy between the information displayed on this website and the information contained 
+		in the databases maintained by the municipality, those maintained by the municipality shall prevail. 
+		No errors on this website excuse or lessen a user's actual tax liability. If you feel your tax liability or 
+		other information presented is in error, please contact the Revenue Collection Office.</p>
+			
+	</div>   
+	<div id="info6" style="display:none; width: 550px;">
+				
+			The information on this web site is provided as a public service. The information on this web site is believed to be 
+			an accurate, complete and a fair representation of the records of the City of Hartford Tax Collector's Office as of Nov 8, 2026. 
+			However, due to the complex nature and volume of information, errors and/or omissions may be present. Accordingly, 
+			the City of Hartford and its officials, employees and agents make no representations, warranties or guarantees concerning 
+			the accuracy of any of the information contained on this web site. Anyone using this web site as a source of information 
+			is urged to verify the information contained herein against his or her own records. The City of Hartford and its officials, 
+			employees and agents shall in no way be responsible for actions taken in reliance upon any information included on this web site.
+			If using this service for income tax purposes we strongly advise taxpayers to contact a professional Federal Income Tax 
+			preparer or the Internal Revenue Service for assistance in properly utilizing the information provided.
+			In no event will the City of Hartford, its officials, employees or agents, be liable for any damages, including, 
+			but not limited to, loss of data, lost profits, business interruption, loss of business information or other 
+			pecuniary loss or consequential damages that might arise from, or relate to, the use of this service or the 
+			information it contains. By using this website, you understand and agree to these terms.
+				
+	</div>  
+	<div id="info7" style="display:none;">
+		<p>Coming soon.</p>
+	</div> 
+	<br><br>
+	&copy;2026 <br>
+	
+	<div class="footer">1031130 visitors</div>
+	
+</div>
+
+<div id="sessionTimeoutWarning" style="display: none"></div>
+
+<div style="display: none;" id="cboxOverlay"></div><div style="display: none;" class="" id="colorbox"><div id="cboxWrapper"><div><div style="float: left;" id="cboxTopLeft"></div><div style="float: left;" id="cboxTopCenter"></div><div style="float: left;" id="cboxTopRight"></div></div><div style="clear: left;"><div style="float: left;" id="cboxMiddleLeft"></div><div style="float: left;" id="cboxContent"><div style="width: 0px; height: 0px; overflow: hidden; float: left;" id="cboxLoadedContent"></div><div style="float: left;" id="cboxLoadingOverlay"></div><div style="float: left;" id="cboxLoadingGraphic"></div><div style="float: left;" id="cboxTitle"></div><div style="float: left;" id="cboxCurrent"></div><div style="float: left;" id="cboxNext"></div><div style="float: left;" id="cboxPrevious"></div><div style="float: left;" id="cboxSlideshow"></div><div style="float: left;" id="cboxClose"></div></div><div style="float: left;" id="cboxMiddleRight"></div></div><div style="clear: left;"><div style="float: left;" id="cboxBottomLeft"></div><div style="float: left;" id="cboxBottomCenter"></div><div style="float: left;" id="cboxBottomRight"></div></div></div><div style="position: absolute; width: 9999px; visibility: hidden; display: none;"></div></div>
+</body>
+</html>

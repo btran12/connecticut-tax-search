@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+<html dir="ltr" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+	<META HTTP-EQUIV="Pragma" CONTENT="NO-CACHE">
+	<META HTTP-EQUIV="Expires" CONTENT="-1">
+	<meta charset="UTF-8">
+	<title>City of Hartford - Tax Bills Search & Pay</title>
+	<meta name="description" content="Revenue Bill Search & Pay - City of Hartford">
+	<link href="/inet/images/hartford.gif" rel="icon">
+	<link rel="stylesheet" type="text/css" href="/inet/css/stylesheet_parking.css">
+	<link rel="stylesheet" type="text/css" href="/inet/css/stylesheet-round-parking.css">
+	<link rel="stylesheet" type="text/css" href="/inet/css/slideshow.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="/inet/css/carousel.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="/inet/css/colorbox.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="/inet/css/jquery/jquery-ui-1.8.16.custom.css">
+	<link rel="stylesheet" type="text/css" href="/inet/css/facebox.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="/inet/css/colorbox.css" media="screen"> 
+	
+	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="/inet/js/jquery/jquery.cookie.js"></script>
+	<script type="text/javascript" src="/inet/js/jquery/jquery.colorbox.js"></script>
+	<script type="text/javascript" src="/inet/js/jquery/tabs.js"></script>
+	<script type="text/javascript" src="/inet/js/common.js"></script>
+	<script type="text/javascript" src="/inet/js/itechshop.js"></script>
+	<script type="text/javascript" src="/inet/js/facebox.js"></script>   
+	<script type="text/javascript" src="/inet/js/qds.js"></script>
+	<script type="text/javascript" src="/inet/js/jquery/jquery.mask.js"></script>
+  	<script type="text/javascript" src="/inet/js/jquery/jquery.idletimer.js"></script>
+
+	<!-- Bootstrap -->
+	<script src="../js/cama/bootstrap.min.js"></script>
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="../css/bootstrap.min.css">
+	<!-- Bootstrap responsive -->
+	<link rel="stylesheet" href="../css/bootstrap-responsive.min.css">
+  	
+	<script type="text/javascript">
+  		if ( $.attrFn ) { $.attrFn.text = true; } // fix session timeout button label missing bug
+	</script>
+		
+	<script type="text/javascript">
+	   jQuery(document).ready(function($) {
+	     $('a[rel*=facebox]').facebox({
+	       loading_image : 'loading.gif',
+	       close_image   : 'closelabel.gif'
+	     });  
+	     $('#payModal').on('hidden', function() {
+		    $(this).removeData('modal');
+		 }); 
+	   })	 
+	</script>
+	
+		  	
+  	
+		<script type="text/javascript">
+			var _gaq = _gaq || [];
+		
+			_gaq.push(['_setAccount', 'UA-31641478-3']);
+		
+			_gaq.push(['_trackPageview']); 
+		
+			(function() {
+			
+			  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			
+			  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			
+			  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		
+			})();
+		</script>
+  		
+	  	
+	<script type="text/javascript" src="/inet/js/jquery/jquery.nivo.slider.pack.js"></script>
+	<script type="text/javascript" src="/inet/js/jquery/jquery.jcarousel.min.js"></script>
+	<!--[if IE 7]>
+	<link rel="stylesheet" type="text/css" href="/inet/css/ie7.css" />
+	<![endif]-->
+	<!--[if lt IE 7]>
+	<link rel="stylesheet" type="text/css" href="/inet/css/ie6.css" />
+	<script type="text/javascript" src="/inet/js/jquery/DD_belatedPNG_0.0.8a-min.js"></script>
+	<script type="text/javascript">
+	DD_belatedPNG.fix('#logo img');
+	</script>
+	<![endif]-->
+	
+	
+  <script type="text/javascript">
+	var idleTime = 1500000; // number of miliseconds until the user is considered idle
+	var initialSessionTimeoutMessage = 'Your session will expire in <span id="sessionTimeoutCountdown"></span>&nbsp;seconds.<br/><br />Click on <b>OK</b> to continue your session.';
+	var sessionTimeoutCountdownId = 'sessionTimeoutCountdown';
+	var redirectAfter = 10; // number of seconds to wait before redirecting the user
+	var redirectTo = '/inet/bill/invaliateSession.do'; // URL to relocate the user to once they have timed out
+	var keepAliveURL = '/inet/bill/home.do'; // URL to call to keep the session alive
+	var expiredMessage = 'Your session has expired.  You are being logged out for security reasons.'; // message to show user when the countdown reaches 0
+	var running = false; // var to check if the countdown is running
+	var timer; // reference to the setInterval timer so it can be stopped
+	$(document).ready(function() {
+		// create the warning window and set autoOpen to false
+		var sessionTimeoutWarningDialog = $("#sessionTimeoutWarning");
+		$(sessionTimeoutWarningDialog).html(initialSessionTimeoutMessage);
+		$(sessionTimeoutWarningDialog).dialog({
+			title: 'Session Expiration Warning',
+			autoOpen: false,	// set this to false so we can manually open it
+			closeOnEscape: false,
+			draggable: false,
+			width: 460,
+			minHeight: 50, 
+			modal: true,
+			beforeclose: function() { // bind to beforeclose so if the user clicks on the "X" or escape to close the dialog, it will work too
+				// stop the timer
+				clearInterval(timer);
+					
+				// stop countdown
+				running = false;
+				
+				// ajax call to keep the server-side session alive
+				$.ajax({
+				  url: keepAliveURL,
+				  async: false
+				});
+			},
+			buttons: {
+				"OK": function() {
+					// close dialog
+					$(this).dialog('close');
+				}
+			},
+			resizable: false,
+			open: function() {
+				// scrollbar fix for IE
+				$('body').css('overflow','hidden');
+			},
+			close: function() {
+				// reset overflow
+				$('body').css('overflow','auto');
+			}
+		}); // end of dialog
+
+
+		// start the idle timer
+		$.idleTimer(idleTime);
+		
+		// bind to idleTimer's idle.idleTimer event
+		$(document).bind("idle.idleTimer", function(){
+			// if the user is idle and a countdown isn't already running
+			if($.data(document,'idleTimer') === 'idle' && !running){
+				var counter = redirectAfter;
+				running = true;
+				
+				// intialisze timer
+				$('#'+sessionTimeoutCountdownId).html(redirectAfter);
+				// open dialog
+				$(sessionTimeoutWarningDialog).dialog('open');
+				
+				// create a timer that runs every second
+				timer = setInterval(function(){
+					counter -= 1;
+					
+					// if the counter is 0, redirect the user
+					if(counter === 0) {
+						$(sessionTimeoutWarningDialog).html(expiredMessage);
+						$(sessionTimeoutWarningDialog).dialog('disable');
+						window.location = redirectTo;
+					} else {
+						$('#'+sessionTimeoutCountdownId).html(counter);
+					};
+				}, 1000);
+			};
+		});
+
+	});
+  </script>
+	<script type="text/javascript">
+	   	jQuery(document).ready(function($) {
+			
+				$( "#sewerMenu" ).css({ 'color': 'yellow', 'font-size': '120%', 'font-weight': 'bold', 'font-style': 'italic' });
+			
+	   })
+	</script>
+	
+	<!-- Google Tag Manager -->
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','GTM-WM5K6FFR');</script>
+	<!-- End Google Tag Manager -->
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WM5K6FFR"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<div id="container">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="header">
+    <div id="logo">
+    	<table>
+    		<tr>
+    			<td>
+    				
+			    		<a href="http://www.cityofhartford.com/" target="_blank"><img src="/inet/images/hartford.gif" title="Revenue Search" alt="Revenue Search"></a>
+					
+    			</td>
+    			<td>			    	
+					
+						<span style="padding-left: 6px; font-weight: bold; font-size: 16px;">City of Hartford</span>
+					
+    			</td>
+    		</tr>
+    	</table>
+    	
+    </div>
+	
+  	<div id="cart">
+  	<div style="float: right; text-transform: none; font-size: 10px; padding-bottom: 10px;">Account info last updated on Nov 8, 2026</div>
+  	
+	
+  	<div class="title"></div>
+  	<div class="heading">
+	   	<img src="/inet/images/cart.png" title="Cart" alt="Cart" style="padding-top: 2px; float: left;">&nbsp;
+	    <a>
+	    	<span id="cart-total">
+	    		0 Bill(s) - $0.00
+	    	</span>
+	    </a>
+	</div>
+  	<div class="content">
+        <div class="mini-cart-info">
+      		<table>
+        	
+        	
+        	
+       		</table>
+   		</div>
+   		
+	    <div class="mini-cart-total">
+	      	<table>
+	          	<tbody>
+	            <tr>
+	          		<td class="right"><b>Total:</b></td>
+	          		<td class="right">$0.00</td>
+	        	</tr>
+	            </tbody>
+	    	</table>
+	    </div>
+    	<div class="checkout"><a href="/inet/bill/cart.do">View Cart</a> | <a href="/inet/bill/cart.do">Checkout</a></div>
+    </div>
+
+</div>
+
+  <div class="links" style="padding-top: 10px;">
+  	
+	  	<a href="/inet/bill/home.do?town=hartford">Home</a>
+	
+	
+	  	<a href="/inet/bill/cart.do">Shopping Cart</a>
+	  	<a href="/inet/bill/cart.do">Checkout</a>
+	
+  </div>
+
+</div>
+<div id="menu">
+  	<ul>
+  		
+       		<li><a id="taxMenu" href="/inet/bill/home.do?town=hartford">Tax Bills</a></li>
+		  		  
+			  		
+		       			<li><a id="sewerMenu" href="/inet/bill/home.do?town=hartford&search=2">Sanitation</a></li>
+			    	
+		    	
+	    	
+	    	
+	    
+  	</ul>
+</div>
+
+<div id="notification">
+	
+ 	
+	
+</div>
+
+
+
+<!-- Default bootstrap modal example -->
+<div class="modal fade" id="payModal" tabindex="-1" role="dialog" aria-labelledby="payModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Make Payment</h4>
+      </div>
+      <div class="modal-body">
+      	<div></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="content">
+	<div class="box">
+	  	<div class="box-content">
+	    	<div class="box-product">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script Language="JavaScript">	
+	function checkForm() { 
+		var listForm   = document.billSearchForm; 
+		
+        name            = trimString(listForm.taxPayerName.value);        
+        propertyName    = trimString(listForm.propertyName.value);      
+        uniqueId        = trimString(listForm.uniqueId.value);   
+        propertyNumber  = trimString(listForm.propertyNumber.value);
+        recordType      = listForm.recordType.value;
+        billNum         = trimString(listForm.billNum.value);
+        billYear         = trimString(listForm.billYear.value);
+        billType         = trimString(listForm.billType.value);     
+        linkType        = trimString(listForm.linkType.value);   
+        linkNum  		= trimString(listForm.linkNum.value);  
+        linkYear  		= trimString(listForm.linkYear.value);
+        accountId  		= trimString(listForm.accountId.value);
+        linkId  		= trimString(listForm.linkId.value);
+        dba  			= trimString(listForm.dba.value);
+       	
+       	listForm.taxPayerName.value    = name;          
+       	listForm.propertyName.value    = propertyName;      
+       	listForm.uniqueId.value 	   = uniqueId;        
+       	listForm.propertyNumber.value  = propertyNumber;     
+       	listForm.recordType.value      = recordType;       
+       	listForm.billNum.value         = billNum;       
+       	listForm.billYear.value        = billYear;        
+       	listForm.billType.value        = billType;       
+       	listForm.linkType.value 	   = linkType;        
+       	listForm.linkNum.value         = linkNum;         
+       	listForm.linkYear.value        = linkYear;     
+       	listForm.accountId.value       = accountId;     
+       	listForm.linkId.value          = linkId;    
+       	listForm.dba.value         	   = dba; 
+        
+	   	listForm.submit();
+	}
+	
+	function trimString(sInString) {
+	  	sInString = sInString.replace( /^\s+/g, "" );// strip leading
+	  	return sInString.replace( /\s+$/g, "" );// strip trailing
+	}	
+	// -->
+</script> 
+
+
+
+
+
+
+<style>
+	.searchLabel {
+		color: #369;
+		font-weight: bold;
+		font-style: italic;
+	}
+</style>
+
+<script type="text/javascript">
+   	jQuery(document).ready(function($) {
+		$('#accountid').hide();
+		$('#name').hide();
+		$('#location').hide();
+		$('#billnumber').hide();
+		$('#uniqueid').hide();
+		$('#linknumber').hide();
+		$('#billTypeDesc').hide();
+		$('#linkId').hide();
+		$('#dba').hide();
+		
+	    
+	   		
+	   		
+	   		
+				$('#name').show();
+			
+	   		
+	   			
+	   		
+	   			
+	   		
+	   			
+	   		
+	   			
+	   		
+	   			
+	   		
+	   				
+	   		
+	   			
+				
+		
+		$('#actionType').change(function() {
+			$('#accountid').hide();
+			$('#name').hide();
+			$('#location').hide();
+			$('#billnumber').hide();
+			$('#uniqueid').hide();
+			$('#linknumber').hide();
+			$('#taxid').hide();
+			$('#billTypeDesc').hide();
+			$('#linkId').hide();
+			$('#dba').hide();
+			
+			var actionType = $(this).attr('value');
+			if (actionType == 'Name') {
+				$('#name').show();
+			} else if (actionType == 'Account ID') {
+				$('#accountid').show();
+			} else if (actionType == 'Property Location') {
+				$('#location').show();
+			} else if (actionType == 'Bill #') {
+				$('#billnumber').show();
+				$('#billTypeDesc').show();
+			} else if (actionType == 'Unique ID') {
+				$('#uniqueid').show();
+			} else if (actionType == 'List Number') {
+				$('#linknumber').show();
+			} else if (actionType == 'Tax ID') {
+				$('#taxid').show();
+			} else if (actionType == 'Link ID') {
+				$('#linkId').show();
+			} else if (actionType == 'DBA') {
+				$('#dba').show();
+			}
+		});  
+   })
+</script>
+
+
+	<p style="color: red; font-weight: bold; padding-left: 10px;">
+		
+		Click on Sanitation ABOVE if you want to search Sanitation bills.</br></br>
+		Click on Tax Bills if you want to search your Real Estate, Personal Property, Motor Vehicle or Supplemental Bills.<br>
+		
+			Please abbreviate: Street to St, Road to Rd, Etc.
+		
+	</p>
+
+
+<form name="billSearchForm" method="post" action="/inet/bill/search.do" onsubmit="return checkForm();">	
+	<div id="column-left" style="padding-right: 20px;">
+	    <div class="box">
+	  		<div class="box-heading" style="text-align: left; font-weight: bold; color: #369;">	  		
+				Search By
+			    				
+	  			<div style="padding-top: 5px; text-align: center">
+			      	<select name="actionType" id="actionType" style="width: 150px;"><option value="Bill #">Bill #</option>
+								
+			      			
+					      		
+							
+			      				<option value="Unique ID">Unique ID</option></select>
+			      	
+			      	
+				      	<br><br>
+						
+			      			<a href="../images/example_utility.png" rel="facebox" style="font-weight: normal; font-size: 12px; text-transform:capitalize;">see example</a>
+		      			
+						
+	      			
+	  			</div>  
+					  	
+	  		</div>
+		</div> 
+	</div> 
+	 
+	<div>
+		<div style="text-align: left; font-weight: bold;">Enter the search criteria below:</div>
+		<div id="name" style="text-align: left; display: block;">
+			<input type="text" name="taxPayerName" size="70" value="SMITH J">&nbsp;&nbsp;
+			<input class="button" type="submit" name="searchbtn" id="searchbtn1" value="Search" onSubmit="javascript:disableBtnWithAutoEnable('searchbtn', 5);">
+	 		&nbsp;&nbsp;<a href="#info2" rel="facebox"><img src="/inet/images/help.gif" style="vertical-align: top; border: 0px;"></a>
+	 		<br><span class="searchlabel">
+	 			<strong>Enter Last Name then space then 1<sup>st</sup> Initial (example SMITH J) or Business Name (No comma)</strong>
+	 		</span>
+			<div id="info2" style="display:none;">
+	 			<p>Enter last name then first name. Do not enter punctuation. Search is not case sensitive. Example: John Doe could be entered as Doe John or as Doe J or as doe john.</p>
+	 			<p>This search will return all bill types.</p>
+			</div> 	
+		</div>
+		
+		<div id="location" style="text-align: left; display: none">
+			<input type="text" name="propertyNumber" size="10" value="">&nbsp;-&nbsp;<input type="text" name="propertyName" size="36" value="">&nbsp;&nbsp;
+			<input class="button" type="submit" name="searchbtn" id="searchbtn2" value="Search" onSubmit="javascript:disableBtnWithAutoEnable('searchbtn', 5);">
+	 		&nbsp;&nbsp;<a href="#info3" rel="facebox"><img src="/inet/images/help.gif" style="vertical-align: top; border: 0px;"></a>
+			<div id="info3" style="display:none;">
+				<p>Enter the property number and/or the property name. Since the words Street, Court, Lane, etc. could be abbreviated differently, do not enter this part of street name.</p>
+				<p>This search only returns real estate and personal property.</p>
+			</div>
+			<br><span class="searchlabel">Property number first and then property street name</span>	
+		</div>
+		
+		<div id="billnumber" style="text-align: left; display: none">
+			<input type="text" name="billYear" maxlength="4" size="4" value="" style="width: 70px;">-<input type="text" name="billType" maxlength="2" size="2" value="" style="width: 70px;">-<input type="text" name="billNum" maxlength="7" size="7" value="" style="width: 70px;">
+			<input class="button" type="submit" name="searchbtn" id="searchbtn3" value="Search" onSubmit="javascript:disableBtnWithAutoEnable('searchbtn', 5);">
+	 		&nbsp;<a href="../images/taxbill.jpg" rel="facebox"><img src="/inet/images/help.gif" border="0" title="Click to view how to search by bill number."></a>
+			<br><span class="searchlabel">Bill year, then bill type and then bill number</span>	
+		</div>
+		
+		<div id="uniqueid" style="text-align: left; display: none">
+			<input type="text" name="uniqueId" size="50" value="" id="uniqueIdField">&nbsp;&nbsp;
+			<input class="button" type="submit" name="searchbtn" id="searchbtn4" value="Search" onSubmit="javascript:disableBtnWithAutoEnable('searchbtn', 5);">
+	 		&nbsp;&nbsp;<a href="#info1" rel="facebox"><img src="/inet/images/help.gif" style="vertical-align: top; border: 0px;"></a>
+			<div id="info1" style="display:none;">
+				<p>If the account number is shown on your bill, it may be entered here. This search will return only real estate and personal property</p>
+			</div>  	
+		</div>
+		
+		<div id="linknumber" style="text-align: left; display: none">
+			<input type="text" name="linkYear" maxlength="4" size="4" value="">&nbsp;-&nbsp;
+  			<select name="linkType"><option value="MV">MV</option>
+			  	<option value="MS">MS</option></select>
+			&nbsp;-&nbsp;<input type="text" name="linkNum" maxlength="7" size="7" value="">&nbsp;&nbsp;
+			<input class="button" type="submit" name="searchbtn" id="searchbtn5" value="Search" onSubmit="javascript:disableBtnWithAutoEnable('searchbtn', 5);">
+	 		&nbsp;&nbsp;<a href="#info4" rel="facebox"><img src="/inet/images/help.gif" style="vertical-align: top; border: 0px;"></a>
+  			<div id="info4" style="display:none;">
+  				<p>
+					Must enter Link Number. This search will return only motor vehicle & motor vehicle supplemental accounts.
+  				</p>
+			</div>
+			<br><span class="searchlabel">Link year, then link type and then link number.</span>		 	
+		</div>
+		
+		<div id="taxid" style="text-align: left; display: none">
+			<input type="text" name="taxId" size="50" value="">&nbsp;&nbsp;
+			<input class="button" type="submit" name="searchbtn" id="searchbtn6" value="Search" onSubmit="javascript:disableBtnWithAutoEnable('searchbtn', 6);">
+	 		&nbsp;&nbsp;<a href="#info15" rel="facebox"><img src="/inet/images/help.gif" style="vertical-align: top; border: 0px;"></a>
+			<div id="info15" style="display:none;">
+				<p>To Search By Tax ID, Search by Bill Number by entering the Grand List Year, Bill Type and then Tax ID</p>
+			</div>  			 	
+		</div>
+		
+		<div id="accountid" style="text-align: left; display: none">
+			<input type="text" name="accountId" size="50" value="" id="accountidfield">&nbsp;&nbsp;
+			<input class="button" type="submit" name="searchbtn" id="searchbtn7" value="Search" onSubmit="javascript:disableBtnWithAutoEnable('searchbtn', 7);">
+	 		&nbsp;&nbsp;<a href="#info16" rel="facebox"><img src="/inet/images/help.gif" style="vertical-align: top; border: 0px;"></a>
+			<div id="info16" style="display:none;">
+				<p>To Search By Account ID, enter account ID</p>
+			</div>  			 	
+		</div>
+		
+		<div id="linkId" style="text-align: left; display: none">
+			<input type="text" name="linkId" maxlength="25" size="40" value="">&nbsp;&nbsp;
+			<input class="button" type="submit" name="searchbtn" id="searchbtn8" value="Search" onSubmit="javascript:disableBtnWithAutoEnable('searchbtn', 8);">
+	 		&nbsp;&nbsp;<a href="#info17" rel="facebox"><img src="/inet/images/help.gif" style="vertical-align: top; border: 0px;"></a>
+  			<div id="info17" style="display:none;">
+  				<p>
+					Must enter Link ID.
+  				</p>
+			</div>
+			<br><span class="searchlabel">Link year, then link type and then link number.</span>		 	
+		</div>
+		
+		<div id="dba" style="text-align: left; display: none">
+			<input type="text" name="dba" maxlength="55" size="50" value="">&nbsp;&nbsp;
+			<input class="button" type="submit" name="searchbtn" id="searchbtn9" value="Search" onSubmit="javascript:disableBtnWithAutoEnable('searchbtn', 9);">
+	 		&nbsp;&nbsp;<a href="#info18" rel="facebox"><img src="/inet/images/help.gif" style="vertical-align: top; border: 0px;"></a>
+  			<div id="info18" style="display:none;">
+  				<p>
+					Must enter DBA.
+  				</p>
+			</div>		 	
+		</div>
+		
+		<div style="padding-top: 10px;">
+	 		<input type="radio" name="recordType" value="0" checked="checked" id="recordType0">All&nbsp;&nbsp;
+	 		<input type="radio" name="recordType" value="1" id="recordType1">Due Now&nbsp;&nbsp;
+	 		<input type="radio" name="recordType" value="2" id="recordType2">Balance Due&nbsp;&nbsp;
+	 		<input type="radio" name="recordType" value="-3" id="recordType3">IRS Payment Records for Year 2025	 		 	
+		</div>
+	</div>
+</form> 
+
+<table id="billTypeDesc" bgcolor="#efefef" align="center" width="80%" cellpadding="0" cellspacing="0" style="border: 1px solid #666; display: none;">	
+	
+	
+	
+		
+				
+			        
+		
+	              	
+	        
+	        
+	        <tr colspan=4>		        
+			<td class="smalldescript" align="left" width="20%">
+				01 - REAL ESTATE              
+			</td>
+        
+        
+		
+	
+		
+				
+			        
+			        
+			<td class="smalldescript" align="left" width="20%">
+				02 - PERSONALPROPERTY         
+			</td>	        	
+        
+        
+		
+	
+		
+				
+			        
+			        
+			<td class="smalldescript" align="left" width="20%">
+				03 - MOTOR VEHICLE            
+			</td>	        	
+        
+        
+		
+	
+		
+				
+			        
+			        
+			<td class="smalldescript" align="left" width="20%">
+				04 - MOTOR VEHICLE SUPP       
+			</td>	        	
+        
+        
+		
+	
+		
+				
+			        
+		
+	        
+	        	</tr>
+	        
+	        
+	        <tr colspan=4>		        
+			<td class="smalldescript" align="left" width="20%">
+				06 - SU                       
+			</td>
+        
+        
+		
+	
+		
+				
+			        
+			        
+			<td class="smalldescript" align="left" width="20%">
+				07 - MSW                      
+			</td>	        	
+        
+        
+		
+	
+		
+				
+			        
+			        
+			<td class="smalldescript" align="left" width="20%">
+				08 - SC                       
+			</td>	        	
+        
+        
+		
+	
+		
+				
+			        
+			        
+			<td class="smalldescript" align="left" width="20%">
+				11 - SANI                     
+			</td>	        	
+        
+        
+		
+	
+		
+				
+			        
+		
+	        
+	        	</tr>
+	        
+	        
+	        <tr colspan=4>		        
+			<td class="smalldescript" align="left" width="20%">
+				20 - HYD                      
+			</td>
+        
+        
+		
+	
+		
+				
+			        
+			        
+			<td class="smalldescript" align="left" width="20%">
+				21 - MISC                     
+			</td>	        	
+        
+        
+		
+	
+		
+				
+			        
+			        
+			<td class="smalldescript" align="left" width="20%">
+				22 - FOG                      
+			</td>	        	
+        
+        
+		
+	
+		
+				
+			        
+			        
+			<td class="smalldescript" align="left" width="20%">
+				23 - OC                       
+			</td>	        	
+        
+        
+		
+	
+		
+				
+			        
+		
+	        
+	        	</tr>
+	        
+	        
+	        <tr colspan=4>		        
+			<td class="smalldescript" align="left" width="20%">
+				24 - FDM                      
+			</td>
+        
+        
+		
+	
+	
+		<td class="smalldescript" align="left" width="20%">	        	
+     
+		<td class="smalldescript" align="left" width="20%">	        	
+     
+		<td class="smalldescript" align="left" width="20%">	        	
+     
+	</tr>
+</table><br><br>
+<div id="div-irs" style="display: none; color:blue; font-weight: bold; float:right;">
+	Check the applicable accounts, then click on the View IRS button for a 
+	listing of payments made in 2025
+</div><br>
+
+<SCRIPT language="javascript">
+	$(function() { 
+	    $("#recordType0").change(function () {
+	    	$("#div-irs").hide();
+		});
+	    $("#recordType1").change(function () {
+	    	$("#div-irs").hide();
+		});
+	    $("#recordType2").change(function () {
+	    	$("#div-irs").hide();
+		});
+	    $("#recordType3").change(function () {
+	    	$("#div-irs").show();
+		});
+	});
+	
+	$(document).ready(function() {
+	   	if($('#recordType3').is(':checked')) { 
+    		$("#div-irs").show();
+	   	}
+	});
+</SCRIPT> 
+
+
+
+
+	
+
+
+ 	
+	
+	
+		<SCRIPT language="javascript">
+		$(function(){ 
+		    // add multiple select / deselect functionality
+		    $("#selectall").click(function () {
+		          $('.selectPayments').attr('checked', this.checked);
+		    });
+		 
+		    // if all checkbox are selected, check the selectall checkbox
+		    // and viceversa
+		    $(".selectPayments").click(function(){ 
+		        if($(".case").length == $(".selectPayments:checked").length) {
+		            $("#selectall").attr("checked", "checked");
+		        } else {
+		            $("#selectall").removeAttr("checked");
+		        } 
+		    });
+		});
+		</SCRIPT>
+		
+		<form name="billSearchForm" method="post" action="/inet/bill/selectUtilities.do">
+		
+		
+		
+			
+		 
+		
+		<center>
+		<div class="cart-info" style="padding-top: 20px;">
+			<table> 
+				<thead>
+				  	<tr align="center">            
+						<td>Bill #</td>
+						<td>Unique ID</td>
+						<td>Bill Type</td>
+						<td>Total Tax</td>
+						<td>Paid</td>
+						<td>Outstanding</td>
+						<td>Options</td>
+				    	 
+							<td align="center">Pay All&nbsp;<input type="checkbox" id="selectall"/></td>
+				    	  
+				  	</tr>
+			  	</thead>
+			  	
+				 
+			        
+			        
+					
+			    		
+			    		
+			    		
+			    		
+				    		
+				        
+				        	<tr class="odd" align="center">
+				        	
+				        
+				        	
+				        
+							
+					        
+				        	    		
+								    	
+						    	<td valign="top">
+						    		<span NOWRAP><font color="#365a7c"><b>2025-11-0001101</b></font></span><br>
+						    		
+						    		
+						    		
+							    	
+						    		
+							    	
+						    	</td>
+						    	
+						    	<td>R10930                      </td>
+						    	
+						    	<td>SANI                      </td>
+					    	
+						    	<td class="bold">     	  	    		
+						    		$893.87
+								</td>
+						    	
+						    	<td class="bold">     	  	    		
+						    		
+						    			$893.87
+						    		
+								</td>
+						    		    	
+						    	<td 
+						    			    		
+						    		
+						    		
+						    	>	
+						    		$0.00
+								</td>
+				    	
+						    	<td nowrap="true">
+						    		<a title="Information on this account" href="/inet/bill/detail.do?search=2&type=2&byear=2025&btype=11&bnum=1101"><img src="../images/detail.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		<a title="Download PDF" href="/inet/download/bill/detail/pdf?util=1&byear=2025&btype=11&bnum=1101"><img src="../images/print.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		
+						    		
+						    			<a title="View All Bills" href="/inet/bill/viewAllBill.do?type=2&byear=2025&btype=11&bnum=1101"><img src="../images/all.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		
+						    		
+						    		
+						    			<a title="View original tax bill" href="/inet/tax/pdf?util=1&byear=2025&btype=11&bnum=1101"><img src="../images/pdf.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    							    		
+								</td>
+				    		
+					    		  
+					    			<td align="center">
+						    			     		
+						    					
+									    		
+								    		
+								    		
+						    				
+							    		
+									</td>
+					    		
+			    			 
+			    		 
+			  			</tr>
+			          	
+					
+			    		
+			    		
+			    		
+			    		
+				    		
+				        
+				        	<tr class="even" align="center">
+				        	
+				        
+				        	
+				        
+							
+					        
+				        	    		
+								    	
+						    	<td valign="top">
+						    		<span NOWRAP><font color="#365a7c"><b>2026-11-0001101</b></font></span><br>
+						    		
+						    		
+						    		
+							    	
+						    		
+							    	
+						    	</td>
+						    	
+						    	<td>R10930                      </td>
+						    	
+						    	<td>SANI                      </td>
+					    	
+						    	<td class="bold">     	  	    		
+						    		$480.00
+								</td>
+						    	
+						    	<td class="bold">     	  	    		
+						    		
+						    			$480.00
+						    		
+								</td>
+						    		    	
+						    	<td 
+						    			    		
+						    		
+						    		
+						    	>	
+						    		$0.00
+								</td>
+				    	
+						    	<td nowrap="true">
+						    		<a title="Information on this account" href="/inet/bill/detail.do?search=2&type=2&byear=2026&btype=11&bnum=1101"><img src="../images/detail.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		<a title="Download PDF" href="/inet/download/bill/detail/pdf?util=1&byear=2026&btype=11&bnum=1101"><img src="../images/print.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		
+						    		
+						    			<a title="View All Bills" href="/inet/bill/viewAllBill.do?type=2&byear=2026&btype=11&bnum=1101"><img src="../images/all.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		
+						    		
+						    		
+						    			<a title="View original tax bill" href="/inet/tax/pdf?util=1&byear=2026&btype=11&bnum=1101"><img src="../images/pdf.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    							    		
+								</td>
+				    		
+					    		  
+					    			<td align="center">
+						    			     		
+						    					
+									    		
+								    		
+								    		
+						    				
+							    		
+									</td>
+					    		
+			    			 
+			    		 
+			  			</tr>
+			          	
+					
+			    		
+			    		
+			    		
+			    		
+				    		
+				        
+				        	<tr class="odd" align="center">
+				        	
+				        
+				        	
+				        
+							
+					        
+				        	    		
+								    	
+						    	<td valign="top">
+						    		<span NOWRAP><font color="#365a7c"><b>2022-11-0001101</b></font></span><br>
+						    		
+						    		
+						    		
+							    	
+						    		
+							    	
+						    	</td>
+						    	
+						    	<td>R10930-LIEN                 </td>
+						    	
+						    	<td>SANI                      </td>
+					    	
+						    	<td class="bold">     	  	    		
+						    		$809.72
+								</td>
+						    	
+						    	<td class="bold">     	  	    		
+						    		
+						    			$809.72
+						    		
+								</td>
+						    		    	
+						    	<td 
+						    			    		
+						    		
+						    		
+						    	>	
+						    		$0.00
+								</td>
+				    	
+						    	<td nowrap="true">
+						    		<a title="Information on this account" href="/inet/bill/detail.do?search=2&type=2&byear=2022&btype=11&bnum=1101"><img src="../images/detail.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		<a title="Download PDF" href="/inet/download/bill/detail/pdf?util=1&byear=2022&btype=11&bnum=1101"><img src="../images/print.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		
+						    		
+						    			<a title="View All Bills" href="/inet/bill/viewAllBill.do?type=2&byear=2022&btype=11&bnum=1101"><img src="../images/all.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		
+						    		
+						    		
+						    			<a title="View original tax bill" href="/inet/tax/pdf?util=1&byear=2022&btype=11&bnum=1101"><img src="../images/pdf.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    							    		
+								</td>
+				    		
+					    		  
+					    			<td align="center">
+						    			     		
+						    					
+									    		
+								    		
+								    		
+						    				
+							    		
+									</td>
+					    		
+			    			 
+			    		 
+			  			</tr>
+			          	
+					
+			    		
+			    		
+			    		
+			    		
+				    		
+				        
+				        	<tr class="even" align="center">
+				        	
+				        
+				        	
+				        
+							
+					        
+				        	    		
+								    	
+						    	<td valign="top">
+						    		<span NOWRAP><font color="#365a7c"><b>2023-11-0001101</b></font></span><br>
+						    		
+						    		
+						    		
+							    	
+						    		
+							    	
+						    	</td>
+						    	
+						    	<td>R10930-LIEN                 </td>
+						    	
+						    	<td>SANI                      </td>
+					    	
+						    	<td class="bold">     	  	    		
+						    		$563.24
+								</td>
+						    	
+						    	<td class="bold">     	  	    		
+						    		
+						    			$563.24
+						    		
+								</td>
+						    		    	
+						    	<td 
+						    			    		
+						    		
+						    		
+						    	>	
+						    		$0.00
+								</td>
+				    	
+						    	<td nowrap="true">
+						    		<a title="Information on this account" href="/inet/bill/detail.do?search=2&type=2&byear=2023&btype=11&bnum=1101"><img src="../images/detail.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		<a title="Download PDF" href="/inet/download/bill/detail/pdf?util=1&byear=2023&btype=11&bnum=1101"><img src="../images/print.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		
+						    		
+						    			<a title="View All Bills" href="/inet/bill/viewAllBill.do?type=2&byear=2023&btype=11&bnum=1101"><img src="../images/all.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		
+						    		
+						    		
+						    			<a title="View original tax bill" href="/inet/tax/pdf?util=1&byear=2023&btype=11&bnum=1101"><img src="../images/pdf.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    							    		
+								</td>
+				    		
+					    		  
+					    			<td align="center">
+						    			     		
+						    					
+									    		
+								    		
+								    		
+						    				
+							    		
+									</td>
+					    		
+			    			 
+			    		 
+			  			</tr>
+			          	
+					
+			    		
+			    		
+			    		
+			    		
+				    		
+				        
+				        	<tr class="odd" align="center">
+				        	
+				        
+				        	
+				        
+							
+					        
+				        	    		
+								    	
+						    	<td valign="top">
+						    		<span NOWRAP><font color="#365a7c"><b>2024-11-0001101</b></font></span><br>
+						    		
+						    		
+						    		
+							    	
+						    		
+							    	
+						    	</td>
+						    	
+						    	<td>R10930-LIEN                 </td>
+						    	
+						    	<td>SANI                      </td>
+					    	
+						    	<td class="bold">     	  	    		
+						    		$563.24
+								</td>
+						    	
+						    	<td class="bold">     	  	    		
+						    		
+						    			$563.24
+						    		
+								</td>
+						    		    	
+						    	<td 
+						    			    		
+						    		
+						    		
+						    	>	
+						    		$0.00
+								</td>
+				    	
+						    	<td nowrap="true">
+						    		<a title="Information on this account" href="/inet/bill/detail.do?search=2&type=2&byear=2024&btype=11&bnum=1101"><img src="../images/detail.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		<a title="Download PDF" href="/inet/download/bill/detail/pdf?util=1&byear=2024&btype=11&bnum=1101"><img src="../images/print.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		
+						    		
+						    			<a title="View All Bills" href="/inet/bill/viewAllBill.do?type=2&byear=2024&btype=11&bnum=1101"><img src="../images/all.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    		
+						    		
+						    		
+						    			<a title="View original tax bill" href="/inet/tax/pdf?util=1&byear=2024&btype=11&bnum=1101"><img src="../images/pdf.png" style="border: 0px; padding-top: 5px;"></a>&nbsp;&nbsp;
+						    							    		
+								</td>
+				    		
+					    		  
+					    			<td align="center">
+						    			     		
+						    					
+									    		
+								    		
+								    		
+						    				
+							    		
+									</td>
+					    		
+			    			 
+			    		 
+			  			</tr>
+			          	
+							     
+				
+			</table>
+		</div>
+		</center>
+		<div class="buttons" style="width: 98%; float: right;">
+			<div class="right">
+				<input type="submit" value="Add to cart" id="button-cart" class="button">			
+			</div>
+	  	</div>	
+		</form>
+		
+	
+	
+</div>
+	  	</div>
+	</div>
+</div>
+<div class="clear"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="powered">	
+	
+	
+	<table width="100%" border=0 cellspacing=0 cellpadding=0>
+		<tr>
+			<td align=center>
+				<table width="90%" border=0 cellspacing=0 cellpadding=0 class=footer>
+					<tr><td align=center>
+					
+						<a href="#info5" rel="facebox" class="footer">Disclaimer</a> |
+						<a href="#info6" rel="facebox" class="footer">Terms And Conditions</a> |
+						<a href="#info7" rel="facebox" class="footer">Privacy Policy</a> |
+					
+					
+					
+						<a href="http://www.cityofhartford.com/" class="footer" target="_blank">Contact</a> 
+					
+					</td></tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	
+	<div id="info5" style="display:none;">
+		<p>The information contained on this website and its pages is obtained from municipal databases. 
+		In the event of a discrepancy between the information displayed on this website and the information contained 
+		in the databases maintained by the municipality, those maintained by the municipality shall prevail. 
+		No errors on this website excuse or lessen a user's actual tax liability. If you feel your tax liability or 
+		other information presented is in error, please contact the Revenue Collection Office.</p>
+			
+	</div>   
+	<div id="info6" style="display:none; width: 550px;">
+				
+			The information on this web site is provided as a public service. The information on this web site is believed to be 
+			an accurate, complete and a fair representation of the records of the City of Hartford Tax Collector's Office as of Nov 8, 2026. 
+			However, due to the complex nature and volume of information, errors and/or omissions may be present. Accordingly, 
+			the City of Hartford and its officials, employees and agents make no representations, warranties or guarantees concerning 
+			the accuracy of any of the information contained on this web site. Anyone using this web site as a source of information 
+			is urged to verify the information contained herein against his or her own records. The City of Hartford and its officials, 
+			employees and agents shall in no way be responsible for actions taken in reliance upon any information included on this web site.
+			If using this service for income tax purposes we strongly advise taxpayers to contact a professional Federal Income Tax 
+			preparer or the Internal Revenue Service for assistance in properly utilizing the information provided.
+			In no event will the City of Hartford, its officials, employees or agents, be liable for any damages, including, 
+			but not limited to, loss of data, lost profits, business interruption, loss of business information or other 
+			pecuniary loss or consequential damages that might arise from, or relate to, the use of this service or the 
+			information it contains. By using this website, you understand and agree to these terms.
+				
+	</div>  
+	<div id="info7" style="display:none;">
+		<p>Coming soon.</p>
+	</div> 
+	<br><br>
+	&copy;2026 <br>
+	
+	<div class="footer">1031130 visitors</div>
+	
+</div>
+
+<div id="sessionTimeoutWarning" style="display: none"></div>
+
+<div style="display: none;" id="cboxOverlay"></div><div style="display: none;" class="" id="colorbox"><div id="cboxWrapper"><div><div style="float: left;" id="cboxTopLeft"></div><div style="float: left;" id="cboxTopCenter"></div><div style="float: left;" id="cboxTopRight"></div></div><div style="clear: left;"><div style="float: left;" id="cboxMiddleLeft"></div><div style="float: left;" id="cboxContent"><div style="width: 0px; height: 0px; overflow: hidden; float: left;" id="cboxLoadedContent"></div><div style="float: left;" id="cboxLoadingOverlay"></div><div style="float: left;" id="cboxLoadingGraphic"></div><div style="float: left;" id="cboxTitle"></div><div style="float: left;" id="cboxCurrent"></div><div style="float: left;" id="cboxNext"></div><div style="float: left;" id="cboxPrevious"></div><div style="float: left;" id="cboxSlideshow"></div><div style="float: left;" id="cboxClose"></div></div><div style="float: left;" id="cboxMiddleRight"></div></div><div style="clear: left;"><div style="float: left;" id="cboxBottomLeft"></div><div style="float: left;" id="cboxBottomCenter"></div><div style="float: left;" id="cboxBottomRight"></div></div></div><div style="position: absolute; width: 9999px; visibility: hidden; display: none;"></div></div>
+</body>
+</html>

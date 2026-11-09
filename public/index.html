@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Search Connecticut municipal tax and sanitation bills by last name and first initial. Compare the same name across multiple towns and view assessments, installments, payment history, and related bills."
+    />
+    <title>Connecticut Tax Bill Search</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <div class="brand">
+          <div class="seal" aria-hidden="true">CT</div>
+          <div>
+            <p class="eyebrow">Public records explorer · Connecticut</p>
+            <h1>Tax Bill Search</h1>
+          </div>
+        </div>
+        <div class="header-side">
+          <span class="pill">Unofficial tool</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="wrap">
+      <section class="search-card" aria-labelledby="search-heading">
+        <div class="search-intro">
+          <h2 id="search-heading">Find a tax bill</h2>
+        </div>
+
+        <form id="search-form" class="search-form" novalidate>
+          <div class="field field-town">
+            <span class="field-label" id="town-label">Towns</span>
+            <div id="town-picker" class="town-picker">
+              <button
+                id="town-picker-button"
+                class="town-picker-button"
+                type="button"
+                aria-labelledby="town-label town-picker-label"
+                aria-haspopup="true"
+                aria-expanded="false"
+                aria-controls="town-picker-panel"
+              >
+                <span id="town-picker-label" class="town-picker-label">Loading towns…</span>
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+
+              <div id="town-picker-panel" class="town-picker-panel" hidden>
+                <div class="town-panel-head">
+                  <input
+                    id="town-search"
+                    class="town-search"
+                    type="search"
+                    placeholder="Find a Connecticut town…"
+                    autocomplete="off"
+                    aria-label="Filter the town list"
+                  />
+                  <div class="town-panel-links">
+                    <button id="town-select-default" class="link-btn" type="button">
+                      Reset
+                    </button>
+                    <button id="town-select-none" class="link-btn" type="button">
+                      Clear
+                    </button>
+                  </div>
+                </div>
+                <div
+                  id="town-list"
+                  class="town-list"
+                  role="group"
+                  aria-label="Connecticut towns"
+                ></div>
+                <p id="town-panel-note" class="town-panel-note"></p>
+              </div>
+            </div>
+            <div id="town-chips" class="town-chips" aria-live="polite"></div>
+          </div>
+
+          <div class="field field-last">
+            <label for="last-name">Last name</label>
+            <input
+              id="last-name"
+              name="last"
+              type="search"
+              placeholder="e.g. Smith"
+              autocomplete="off"
+              autocapitalize="words"
+              maxlength="60"
+              required
+            />
+          </div>
+
+          <div class="field field-initial">
+            <label for="first-initial">First name</label>
+            <input
+              id="first-initial"
+              name="initial"
+              type="text"
+              placeholder="J or John"
+              autocomplete="off"
+              autocapitalize="characters"
+              maxlength="20"
+              />
+          </div>
+
+          <div class="field">
+            <label for="dataset">Records</label>
+            <select id="dataset" name="dataset">
+              <option value="tax">Tax bills</option>
+              <option value="sanitation">Sanitation</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="record-type">Show</label>
+            <select id="record-type" name="recordType">
+              <option value="0">All bills</option>
+              <option value="1">Due now</option>
+              <option value="2">Balance due</option>
+            </select>
+          </div>
+
+          <div class="field field-submit" style="margin-top: 20px;">
+            <label class="sr-only" for="search-button">Search</label>
+            <button id="search-button" class="btn btn-primary" type="submit">
+              <span class="btn-label">Search records</span>
+            </button>
+          </div>
+
+          <label class="checkbox deep-toggle">
+            <input id="deep-search" type="checkbox" />
+            <span>
+              Load full details now
+              <small>Slower: fetches assessments, installments, and payments for every result.</small>
+            </span>
+          </label>
+        </form>
+      </section>
+
+      <div id="status" class="status" role="status" aria-live="polite" hidden>
+        <span class="spinner" aria-hidden="true"></span>
+        <span id="status-text">Searching…</span>
+      </div>
+
+      <section id="summary" class="summary" aria-label="Search summary" hidden>
+        <article class="stat">
+          <span class="stat-label">Bills found</span>
+          <strong id="stat-count">0</strong>
+          <small id="stat-query"></small>
+        </article>
+        <article class="stat">
+          <span class="stat-label">Total tax</span>
+          <strong id="stat-tax">$0.00</strong>
+          <small>Billed amount</small>
+        </article>
+        <article class="stat">
+          <span class="stat-label">Paid</span>
+          <strong id="stat-paid">$0.00</strong>
+          <small>Payments applied</small>
+        </article>
+        <article class="stat stat-alert">
+          <span class="stat-label">Outstanding</span>
+          <strong id="stat-outstanding">$0.00</strong>
+          <small>Remaining balance</small>
+        </article>
+        <article class="stat" id="stat-due-card" hidden>
+          <span class="stat-label">Total due now</span>
+          <strong id="stat-due">$0.00</strong>
+          <small id="stat-due-note">Includes interest and fees</small>
+        </article>
+      </section>
+
+      <div id="town-breakdown" class="town-breakdown" aria-label="Results by town" hidden></div>
+
+      <section id="results-section" class="results-section" aria-labelledby="results-heading" hidden>
+        <div class="results-toolbar">
+          <div class="results-title">
+            <h2 id="results-heading">Results</h2>
+            <p id="results-subtitle"></p>
+          </div>
+          <div class="toolbar-actions">
+            <label class="sr-only" for="result-filter">Filter results</label>
+            <input
+              id="result-filter"
+              class="filter-input"
+              type="search"
+              placeholder="Filter by name, bill #, address…"
+              autocomplete="off"
+            />
+            <button id="load-all" class="btn btn-secondary" type="button" hidden>
+              Load all details
+            </button>
+            <button id="export-csv" class="btn btn-ghost" type="button">
+              Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div id="progress" class="progress" hidden aria-live="polite">
+          <div class="progress-row">
+            <span id="progress-label">Loading details…</span>
+            <span id="progress-count"></span>
+          </div>
+          <div class="progress-track"><span id="progress-bar"></span></div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="results-table" class="results-table">
+            <caption class="sr-only">
+              Public tax bill search results
+            </caption>
+            <thead>
+              <tr>
+                <th class="col-expand" scope="col"><span class="sr-only">Details</span></th>
+                <th scope="col">Bill #</th>
+                <th scope="col" class="town-col" hidden>Town</th>
+                <th scope="col">Name / address</th>
+                <th scope="col">Type</th>
+                <th scope="col">Property / vehicle</th>
+                <th scope="col" class="num">Total tax</th>
+                <th scope="col" class="num">Paid</th>
+                <th scope="col" class="num">Outstanding</th>
+                <th scope="col" class="num due-col" hidden>Due now</th>
+                <th scope="col" class="col-links">Official record</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+
+        <div id="empty-results" class="empty-state" hidden>
+          <h3>No matching bills</h3>
+          <p>
+            Try a shorter last name, remove the first initial, or check the
+            <em>All bills</em> filter.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-inner">
+        <div>
+          <strong>Connecticut Tax Bill Search</strong>
+          <p>
+            An independent convenience tool over public municipal records
+            published at
+            <a
+              href="https://www.mytaxbill.org/inet/bill/home.do?town="
+              target="_blank"
+              rel="noopener noreferrer"
+              >mytaxbill.org</a
+            >. Not affiliated with any Connecticut municipality.
+          </p>
+        </div>
+        <p class="disclaimer">
+          Records are provided “as is.” Figures may be out of date or contain
+          errors. Town coverage varies; only towns marked available in the
+          picker can be searched. Verify anything important with the local Tax
+          Collector before relying on it. This app does not accept payments.
+        </p>
+      </div>
+    </footer>
+
+    <div id="toast" class="toast" role="alert" hidden></div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
